@@ -16,6 +16,7 @@ import Colors from '../constants/Colors';
 import {BASE_URL, SANDBOX_KEY, API_SECRET} from '../config';
 
 export default function HomeScreen(props) {
+  const [transactions, setTransactions] = useState([]);
   const [visible, setVisible] = useState(false);
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState({});
@@ -23,6 +24,10 @@ export default function HomeScreen(props) {
   useEffect(() => {
     if (data.account_email) props.navigation.navigate('FundWallet', {data});
   }, [data]);
+
+  useEffect(() => {
+    getTransactions();
+  }, []);
 
   const showDialog = () => {
     setVisible(true);
@@ -69,6 +74,25 @@ export default function HomeScreen(props) {
         },
         {text: 'OK', onPress: () => console.log('OK Pressed')},
       ]);
+    }
+  };
+
+  const getTransactions = async () => {
+    setLoading(true);
+    try {
+      await axios({
+        method: 'get',
+        headers: {
+          'api-secret': API_SECRET,
+          'sandbox-key': SANDBOX_KEY,
+        },
+        url: `${BASE_URL}/api/woven/transactions?from=2021-01-01&status=ACTIVE&to=2021-11-09&unique_reference=SPKL100007629691012078221614840477696&settlement_status=settled`,
+      });
+      setLoading(false);
+      setTransactions();
+    } catch (error) {
+      console.log(error);
+      setLoading(false);
     }
   };
 

@@ -1,15 +1,38 @@
 import React, {useState, useEffect} from 'react';
 import {View, Text, StyleSheet, ActivityIndicator} from 'react-native';
-import DialogInput from 'react-native-dialog-input';
 import axios from 'axios';
-import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import Entypo from 'react-native-vector-icons/Entypo';
-
+import {BASE_URL, SANDBOX_KEY, API_SECRET} from '../config';
 import {ScrollView} from 'react-native-gesture-handler';
 import Colors from '../constants/Colors';
 
 export default function TransactionScreen(props) {
+  const [transactions, setTransactions] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    getTransactions();
+  }, []);
+
+  const getTransactions = async () => {
+    setLoading(true);
+    try {
+      await axios({
+        method: 'get',
+        headers: {
+          'api-secret': API_SECRET,
+          'sandbox-key': SANDBOX_KEY,
+        },
+        url: `${BASE_URL}/api/woven/transactions?from=2021-01-01&status=ACTIVE&to=2021-11-09&unique_reference=SPKL100007629691012078221614840477696&settlement_status=settled`,
+      });
+      setLoading(false);
+      setTransactions();
+    } catch (error) {
+      console.log(error);
+      setLoading(false);
+    }
+  };
+
   return (
     <View style={styles.main}>
       <ScrollView>
